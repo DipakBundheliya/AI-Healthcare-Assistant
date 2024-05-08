@@ -46,7 +46,6 @@ def load_data_and_create_index():
     
     return index
 
-
 def response_within_domain(text):
     healthcare_keywords = [
     "disease", "symptom", "treatment", "medicine", "health", "medical", "doctor", "hospital", "patient", "care",
@@ -66,7 +65,7 @@ def greetings_or_OOD(prompt , classifier):
     healthcare_keywords = ['nutrition', 'diet', 'hygiene', 'injury', 'greeting' ,
     'programming language', 'hospital', 'symptoms', 'cancer', 'pain', 'heart dieses' ,'X-ray','MRI','CT scan',
     'temperature', 'physical activity', 'medication', 'therapy', 'surgery', 'diagnosis',
-    'exercise', 'treatment',
+    'exercise', 'treatment', 'mental stress' ,
     'illness', 'disability', 'genetics']
     label_info = classifier(prompt, healthcare_keywords , multi_label=True)
     print(label_info)
