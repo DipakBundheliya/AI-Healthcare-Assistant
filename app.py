@@ -2,12 +2,24 @@ import streamlit as st
 import logging
 import sys
 import time
+import logging
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
 from llama_index.llms.llama_cpp import LlamaCPP
 from llama_index.llms.llama_cpp.llama_utils import messages_to_prompt, completion_to_prompt
 from llama_index.embeddings.langchain import LangchainEmbedding
 from langchain.embeddings import HuggingFaceEmbeddings
 from transformers import pipeline
+
+
+# Configure the logger
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    filename="logs.log",
+)
+
+# Create a logger
+logger = logging.getLogger("streamlit_app")
 
 # Set up logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -18,22 +30,28 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 def load_data_and_create_index():
     # Load documents
     documents = SimpleDirectoryReader("/content/Data").load_data()
-    
+    logger.debug("Documents loaded successfully")
+
     # Create LlamaCPP instance
-    llm = LlamaCPP(
-        model_url='https://huggingface.co/MaziyarPanahi/BioMistral-7B-GGUF/resolve/main/BioMistral-7B.Q4_K_M.gguf',
-        temperature=0.1,
-        max_new_tokens=256,
-        context_window=3900,
-        model_kwargs={"n_gpu_layers": -1},
-        messages_to_prompt=messages_to_prompt,
-        completion_to_prompt=completion_to_prompt,
-        verbose=True,
-    )
+    try:
+        llm = LlamaCPP(
+            model_url='https://huggingface.co/MaziyarPanahi/BioMistral-7B-GGUF/resolve/main/BioMistral-7B.Q4_K_M.gguf',
+            temperature=0.1,
+            max_new_tokens=256,
+            context_window=3900,
+            model_kwargs={"n_gpu_layers": -1},
+            messages_to_prompt=messages_to_prompt,
+            completion_to_prompt=completion_to_prompt,
+            verbose=True,
+        )
+        logger.debug("Model download successfully")
+    except Exception as e:
+        logger.debug("Unexpected error : ",e)
+        logger.debug("Error occurs while downloading..")
 
     # Create LangchainEmbedding instance
     embed_model = LangchainEmbedding(HuggingFaceEmbeddings(model_name="thenlper/gte-large"))
-
+    logger.debug("Embedding model download successfully")
     # Create ServiceContext
     service_context = ServiceContext.from_defaults(
         chunk_size=256,
@@ -43,7 +61,7 @@ def load_data_and_create_index():
 
     # Create VectorStoreIndex from documents
     index = VectorStoreIndex.from_documents(documents, service_context=service_context)
-    
+    logger.debug("Vectors created successfully")
     return index
 
 def response_within_domain(text):
@@ -121,6 +139,7 @@ def model_response(prompt,query_engine , classifier):
             
 def response_generator(prompt,query_engine , classifier):
     response = model_response(prompt,query_engine , classifier)
+    logger.debug("Get model response successfully")
     for word in response.split():
         yield word + " "
         time.sleep(0.05)
