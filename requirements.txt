@@ -1,5 +1,4 @@
-llama-index==0.10.34
-llama_cpp_python==0.2.69
+llama-index==0.10.34 
 llama-index-embeddings-langchain==0.1.2
 pypdf==4.2.0
 python-dotenv==1.0.1
