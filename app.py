@@ -13,7 +13,7 @@ from transformers import pipeline
 
 # Configure the logger
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.info,
     format="%(asctime)s - %(levelname)s - %(message)s",
     filename="logs.log",
 )
@@ -30,7 +30,7 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 def load_data_and_create_index():
     # Load documents
     documents = SimpleDirectoryReader("/content/Data").load_data()
-    logger.debug("Documents loaded successfully")
+    logger.info("Documents loaded successfully")
 
     # Create LlamaCPP instance
     try:
@@ -44,14 +44,14 @@ def load_data_and_create_index():
             completion_to_prompt=completion_to_prompt,
             verbose=True,
         )
-        logger.debug("Model download successfully")
+        logger.info("Model download successfully")
     except Exception as e:
-        logger.debug("Unexpected error : ",e)
-        logger.debug("Error occurs while downloading..")
+        logger.info("Unexpected error : ",e)
+        logger.info("Error occurs while downloading..")
 
     # Create LangchainEmbedding instance
     embed_model = LangchainEmbedding(HuggingFaceEmbeddings(model_name="thenlper/gte-large"))
-    logger.debug("Embedding model download successfully")
+    logger.info("Embedding model download successfully")
     # Create ServiceContext
     service_context = ServiceContext.from_defaults(
         chunk_size=256,
@@ -61,7 +61,7 @@ def load_data_and_create_index():
 
     # Create VectorStoreIndex from documents
     index = VectorStoreIndex.from_documents(documents, service_context=service_context)
-    logger.debug("Vectors created successfully")
+    logger.info("Vectors created successfully")
     return index
 
 def response_within_domain(text):
@@ -139,7 +139,7 @@ def model_response(prompt,query_engine , classifier):
             
 def response_generator(prompt,query_engine , classifier):
     response = model_response(prompt,query_engine , classifier)
-    logger.debug("Get model response successfully")
+    logger.info("Get model response successfully")
     for word in response.split():
         yield word + " "
         time.sleep(0.05)
