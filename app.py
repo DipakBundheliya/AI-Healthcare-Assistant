@@ -32,7 +32,7 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 @st.cache(allow_output_mutation=True)  # Cache to load data only once
 def load_data_and_create_index():
     # Load documents
-    documents = SimpleDirectoryReader("/content/Data").load_data()
+    documents = SimpleDirectoryReader("/Data").load_data()
     logger.info("Documents loaded successfully")
 
     # Create LlamaCPP instance
